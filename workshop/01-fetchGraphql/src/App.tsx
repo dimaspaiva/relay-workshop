@@ -13,7 +13,8 @@ interface Post {
 const App = () => {
   const [posts, setPosts] = useState([]);
   const [error, setError] = useState(false);
-  const [nextPage, setNextPage] = useState(false);
+  const [after, setAfter] = useState(null);
+  const [before, setBefore] = useState(null);
 
   const handleFetch = async (query: string) => {
     setError(false);
@@ -26,6 +27,10 @@ const App = () => {
       },
       body: JSON.stringify({
         query,
+        variables: {
+          after,
+          before,
+        },
       }),
     });
 
@@ -34,29 +39,27 @@ const App = () => {
 
   const handlePosts = data => {
     const posts = data.posts.edges.map(({ node }: { node: Post }) => ({ id: node.id, content: node.content }));
-    const { hasNextPage, endCursor } = data.posts.pageInfo;
+    const { hasNextPage, hasPreviousPage, endCursor } = data.posts.pageInfo;
+
     if (hasNextPage) {
-      setNextPage(endCursor);
+      setAfter(endCursor);
+    } else {
+      setAfter(null);
     }
-    setNextPage(false);
+
+    if (hasPreviousPage) {
+      setBefore(endCursor);
+    } else {
+      setBefore(null);
+    }
+
     setPosts(posts);
   };
 
-  const handleRequestPosts = (pagination?: string) => {
-    const queryVars =
-      pagination === 'after'
-        ? {
-            declare: '($nexPage: String)',
-            value: `after: ${nextPage}`,
-          }
-        : {
-            declare: '($prevPage: String)',
-            value: `before: ${nextPage}`,
-          };
-
+  const handleRequestPosts = () => {
     const query = `
-    query getPosts ${nextPage ? queryVars.declare : ''} {
-      posts(first: 10 ${nextPage ? queryVars.value : ''}) {
+    query getPosts ($after: String, $before: String) {
+      posts(first: 10 after: $after before: $before) {
         edges {
           node {
             id
@@ -66,6 +69,7 @@ const App = () => {
         pageInfo {
           endCursor
           hasNextPage
+          hasPreviousPage
         }
       }
     }
@@ -106,8 +110,8 @@ const App = () => {
           ))}
         </Flex>
       </Flex>
-      {nextPage && <Button onClick={() => handleRequestPosts('before')}>Prev</Button>}
-      {nextPage && <Button onClick={() => handleRequestPosts('after')}>Next</Button>}
+      {before && <Button onClick={() => handleRequestPosts()}>Prev</Button>}
+      {after && <Button onClick={() => handleRequestPosts()}>Next</Button>}
     </Content>
   );
 };
