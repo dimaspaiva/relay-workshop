@@ -16,7 +16,7 @@ const App = () => {
   const [after, setAfter] = useState(null);
   const [before, setBefore] = useState(null);
 
-  const handleFetch = async (query: string) => {
+  const handleFetch = async (query: string, variables: {}) => {
     setError(false);
 
     const response = await fetch(config.GRAPHQL_URL, {
@@ -27,10 +27,7 @@ const App = () => {
       },
       body: JSON.stringify({
         query,
-        variables: {
-          after,
-          before,
-        },
+        variables,
       }),
     });
 
@@ -75,7 +72,12 @@ const App = () => {
     }
   `;
 
-    handleFetch(query)
+    const variables = {
+      after,
+      before,
+    };
+
+    handleFetch(query, variables)
       .then(({ data }) => {
         handlePosts(data);
       })
