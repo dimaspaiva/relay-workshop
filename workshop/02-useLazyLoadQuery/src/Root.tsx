@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { Suspense, FC } from 'react';
 
 import Providers from './Providers';
 import App from './App';
+import Loading from './Loading';
+import ErrorBoundary from './ErrorBoundary';
 
-const Root = () => {
+const Root: FC = () => {
   /**
    * @TODO
    * Add Suspense to suspend when using useLazyLoadQuery
@@ -11,9 +13,13 @@ const Root = () => {
    */
 
   return (
-    <Providers>
-      <App />
-    </Providers>
+    <ErrorBoundary>
+      <Providers>
+        <Suspense fallback={<Loading />}>
+          <App />
+        </Suspense>
+      </Providers>
+    </ErrorBoundary>
   );
 };
 
