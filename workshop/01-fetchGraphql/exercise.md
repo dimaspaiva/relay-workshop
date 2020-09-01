@@ -21,6 +21,6 @@ query {
 
 ## Extras
 
-- [ ] handle error
-- [ ] handle retry using a button to retry network request
-- [ ] handle pagination
+- [x] handle error
+- [x] handle retry using a button to retry network request
+- [x] handle pagination

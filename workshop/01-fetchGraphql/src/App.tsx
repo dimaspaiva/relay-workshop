@@ -1,22 +1,100 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Flex, Text } from 'rebass';
 import { Card, Content, Button } from '@workshop/ui';
 
-const App = () => {
-  const posts = [];
-  const error = false;
+import config from './config';
 
-  /**
-   * @TODO
-   * Fetch posts to be rendered in this component
-   */
+interface Post {
+  content: string;
+  id: string;
+}
+
+const App = () => {
+  const [posts, setPosts] = useState([]);
+  const [error, setError] = useState(false);
+  const [after, setAfter] = useState(null);
+  const [before, setBefore] = useState(null);
+
+  const handleFetch = async (query: string, variables: {}) => {
+    setError(false);
+
+    const response = await fetch(config.GRAPHQL_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+      body: JSON.stringify({
+        query,
+        variables,
+      }),
+    });
+
+    return response.json();
+  };
+
+  const handlePosts = data => {
+    const posts = data.posts.edges.map(({ node }: { node: Post }) => ({ id: node.id, content: node.content }));
+    const { hasNextPage, hasPreviousPage, endCursor } = data.posts.pageInfo;
+
+    if (hasNextPage) {
+      setAfter(endCursor);
+    } else {
+      setAfter(null);
+    }
+
+    if (hasPreviousPage) {
+      setBefore(endCursor);
+    } else {
+      setBefore(null);
+    }
+
+    setPosts(posts);
+  };
+
+  const handleRequestPosts = () => {
+    const query = `
+    query getPosts ($after: String, $before: String) {
+      posts(first: 10 after: $after before: $before) {
+        edges {
+          node {
+            id
+            content
+          }
+        }
+        pageInfo {
+          endCursor
+          hasNextPage
+          hasPreviousPage
+        }
+      }
+    }
+  `;
+
+    const variables = {
+      after,
+      before,
+    };
+
+    handleFetch(query, variables)
+      .then(({ data }) => {
+        handlePosts(data);
+      })
+      .catch(() => setError(true));
+  };
+
+  useEffect(() => {
+    handleRequestPosts();
+  }, []);
 
   if (error) {
     return (
       <Content>
         <Text>Error: {error}</Text>
-        <Button mt='10px'>retry</Button>
+        <Button mt='10px' onClick={() => handleRequestPosts()}>
+          retry
+        </Button>
       </Content>
     );
   }
@@ -26,7 +104,7 @@ const App = () => {
       <Flex flexDirection='column'>
         <Text>Posts</Text>
         <Flex flexDirection='column'>
-          {posts.map(post => (
+          {posts.map((post: Post) => (
             <Card key={post.id} mt='10px' flexDirection='column' p='10px'>
               <Text>id: {post.id}</Text>
               <Text>content: {post.content}</Text>
@@ -34,8 +112,8 @@ const App = () => {
           ))}
         </Flex>
       </Flex>
-      <Button>Prev</Button>
-      <Button>Next</Button>
+      {before && <Button onClick={() => handleRequestPosts()}>Prev</Button>}
+      {after && <Button onClick={() => handleRequestPosts()}>Next</Button>}
     </Content>
   );
 };
