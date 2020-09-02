@@ -9,9 +9,11 @@ import IconButton from '@material-ui/core/IconButton';
 import { useMutation } from '@workshop/relay';
 
 import { likeOptimisticResponse, PostLike } from './PostLikeMutation';
+import { unLikeOptimisticResponse, PostUnLike } from './PostUnLikeMutation';
 
 import { Post_post } from './__generated__/Post_post.graphql';
 import { PostLikeMutation } from './__generated__/PostLikeMutation.graphql';
+import { PostUnLikeMutation } from './__generated__/PostUnLikeMutation.graphql';
 
 type Props = {
   post: Post_post;
@@ -33,23 +35,21 @@ const Post = (props: Props) => {
   const post = useFragment(postQuery, props.post);
 
   const [postLike] = useMutation<PostLikeMutation>(PostLike);
+  const [postUnLike] = useMutation<PostUnLikeMutation>(PostUnLike);
 
   const Icon = post.meHasLiked ? FavoriteIcon : FavoriteBorderIcon;
 
   const handleLike = useCallback(() => {
-    // eslint-disable-next-line
     const config = {
       variables: {
         input: {
           post: post.id,
         },
       },
-      opmisticResponse: likeOptimisticResponse,
+      opmisticResponse: post.meHasLiked ? unLikeOptimisticResponse : likeOptimisticResponse,
     };
 
-    if (!post.meHasLiked) {
-      postLike(config);
-    }
+    post.meHasLiked ? postUnLike(config) : postLike(config);
   }, [post]);
 
   return (
