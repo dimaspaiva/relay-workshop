@@ -1,10 +1,5 @@
-// eslint-disable-next-line
 import { graphql } from 'react-relay';
 
-/**
- * TODO
- * add mutation input and output here
- */
 export const PostLike = graphql`
   mutation PostLikeMutation($input: PostLikeInput!) {
     PostLike(input: $input) {
@@ -18,10 +13,6 @@ export const PostLike = graphql`
   }
 `;
 
-/**
- * TODO
- * add Post Like optimistic update
- */
 export const likeOptimisticResponse = post => ({
   PostLike: {
     success: '',
