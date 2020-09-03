@@ -7,6 +7,7 @@ import { graphql } from 'react-relay/hooks';
 import { usePaginationFragment } from 'react-relay/lib/hooks';
 
 import Post from './Post';
+import PostComposer from './PostComposer';
 
 import { Feed_query, Feed_query$key } from './__generated__/Feed_query.graphql';
 import { FeedPaginationQuery } from './__generated__/FeedPaginationQuery.graphql';
@@ -57,6 +58,7 @@ const Feed = (props: Props) => {
 
   return (
     <Flex flexDirection='column'>
+      <PostComposer />
       {posts.edges.map(({ node }) => (
         <Post key={node.id} post={node} me={me} />
       ))}
