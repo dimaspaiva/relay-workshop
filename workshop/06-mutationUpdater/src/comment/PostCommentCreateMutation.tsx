@@ -27,6 +27,8 @@ export const PostCommentCreate = graphql`
   }
 `;
 
+let tempID = 0;
+
 const getConnection = (parentId: string, store: RecordSourceSelectorProxy) => {
   const parentProxy = store.get(parentId);
 
@@ -56,8 +58,6 @@ export const updater = (parentId: string): SelectorStoreUpdater => (store: Recor
 
   insertEdge(newEdge, parentId, store);
 };
-
-let tempID = 0;
 
 const createNode = (store: RecordSourceSelectorProxy, me: PostCommentComposer_me, input: PostCommentCreateInput) => {
   const id = 'client:newComment:' + tempID++;
