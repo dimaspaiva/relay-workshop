@@ -12,6 +12,7 @@ type Props = {
   post: PostComments_post$key;
 };
 const PostComments = (props: Props) => {
+  // eslint-disable-next-line relay/generated-flow-types
   const post = useFragment<PostComments_post$key>(
     graphql`
       fragment PostComments_post on Post
@@ -54,7 +55,8 @@ const PostComments = (props: Props) => {
 
   return (
     <Flex flex={1} p='16px' flexDirection='column'>
-      {post.comments.edges.map(({ node }) => {
+      <Text>Comments: {edges.length}</Text>
+      {comments.edges.map(({ node }) => {
         return (
           <Flex mt='10px' key={node.id}>
             <UserAvatar showName={false} user={node.user} />

@@ -5,7 +5,7 @@ import config from '../config';
 
 // read from localstorage or cookie
 const getToken = () => {
-  return 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWMyY2I0NTI5NjJiNmNjZTA3OGNmMCIsImlhdCI6MTU4NzI5MzM2NH0.ieeCANyYeNMwbSF2MH-lYFsLNO_ZWqWsP8H3M-KF7mA';
+  return 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMGQxN2JmOTY4Yzk4Y2E4MGNjMzUzYSIsImlhdCI6MTU5OTA3ODM1MH0.8BhVqFHEg0M-D1QKruDn3MqIRnH5_fTC82dSuO2X0RA';
 };
 
 export const fetchGraphQL = async (request: RequestParameters, variables: Variables) => {

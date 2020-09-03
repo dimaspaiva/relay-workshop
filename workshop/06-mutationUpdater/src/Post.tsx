@@ -14,6 +14,7 @@ type Props = {
   me: Post_me;
 };
 const Post = (props: Props) => {
+  // eslint-disable-next-line relay/generated-flow-types
   const post = useFragment<Post_post$key>(
     graphql`
       fragment Post_post on Post {
@@ -32,6 +33,7 @@ const Post = (props: Props) => {
     props.post,
   );
 
+  // eslint-disable-next-line relay/generated-flow-types
   const me = useFragment<Post_me$key>(
     graphql`
       fragment Post_me on User {

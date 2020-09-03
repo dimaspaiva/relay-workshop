@@ -26,6 +26,7 @@ type Props = {
   me: PostCommentComposer_me$key;
 };
 const PostCommentComposer = (props: Props) => {
+  // eslint-disable-next-line relay/generated-flow-types
   const post = useFragment<PostCommentComposer_post$key>(
     graphql`
       fragment PostCommentComposer_post on Post {
@@ -38,6 +39,7 @@ const PostCommentComposer = (props: Props) => {
     props.post,
   );
 
+  // eslint-disable-next-line relay/generated-flow-types
   const me = useFragment<PostCommentComposer_me$key>(
     graphql`
       fragment PostCommentComposer_me on User {
