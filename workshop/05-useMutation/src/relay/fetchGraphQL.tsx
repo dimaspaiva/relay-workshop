@@ -9,7 +9,7 @@ const getToken = () => {
    * TODO
    * use your user token
    */
-  return 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVlOWMyY2I0NTI5NjJiNmNjZTA3OGNmMCIsImlhdCI6MTU4NzI5MzM2NH0.ieeCANyYeNMwbSF2MH-lYFsLNO_ZWqWsP8H3M-KF7mA';
+  return 'JWT eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmMGQxN2JmOTY4Yzk4Y2E4MGNjMzUzYSIsImlhdCI6MTU5OTA3MDY0NX0.ASj8rSbm53RrSSYgZpVcB4HhyBTxXjWs_hIgxI3Gbag';
 };
 
 export const fetchGraphQL = async (request: RequestParameters, variables: Variables) => {

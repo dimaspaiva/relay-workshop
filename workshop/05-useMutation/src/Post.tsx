@@ -6,52 +6,50 @@ import FavoriteIcon from '@material-ui/icons/Favorite';
 import FavoriteBorderIcon from '@material-ui/icons/FavoriteBorder';
 import IconButton from '@material-ui/core/IconButton';
 
-import { Post_post, Post_post$key } from './__generated__/Post_post.graphql';
+import { useMutation } from '@workshop/relay';
+
+import { likeOptimisticResponse, PostLike } from './PostLikeMutation';
+import { unLikeOptimisticResponse, PostUnLike } from './PostUnLikeMutation';
+
+import { Post_post } from './__generated__/Post_post.graphql';
+import { PostLikeMutation } from './__generated__/PostLikeMutation.graphql';
+import { PostUnLikeMutation } from './__generated__/PostUnLikeMutation.graphql';
 
 type Props = {
   post: Post_post;
 };
-const Post = (props: Props) => {
-  const post = useFragment<Post_post$key>(
-    graphql`
-      fragment Post_post on Post {
-        id
-        content
-        author {
-          name
-        }
-        meHasLiked
-        likesCount
-      }
-    `,
-    props.post,
-  );
 
-  /**
-   * TODO
-   * useMutation from @workshop/relay
-   */
+const Post = (props: Props) => {
+  const postQuery = graphql`
+    fragment Post_post on Post {
+      id
+      content
+      author {
+        name
+      }
+      meHasLiked
+      likesCount
+    }
+  `;
+
+  const post = useFragment(postQuery, props.post);
+
+  const [postLike] = useMutation<PostLikeMutation>(PostLike);
+  const [postUnLike] = useMutation<PostUnLikeMutation>(PostUnLike);
 
   const Icon = post.meHasLiked ? FavoriteIcon : FavoriteBorderIcon;
 
   const handleLike = useCallback(() => {
-    // eslint-disable-next-line
     const config = {
       variables: {
         input: {
           post: post.id,
         },
       },
-      /**
-       * TODO
-       * add optimistic update to mutation config
-       */
+      opmisticResponse: post.meHasLiked ? unLikeOptimisticResponse : likeOptimisticResponse,
     };
 
-    /**
-     * TODO
-     * call post like mutation
-     */
+    post.meHasLiked ? postUnLike(config) : postLike(config);
   }, [post]);
 
   return (
