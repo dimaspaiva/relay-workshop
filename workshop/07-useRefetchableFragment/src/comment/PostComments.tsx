@@ -21,7 +21,7 @@ const PostComments = (props: Props) => {
     graphql`
       fragment PostComments_post on Post
         @argumentDefinitions(
-          first: { type: Int, defaultValue: 3 }
+          first: { type: Int }
           last: { type: Int }
           before: { type: String }
           after: { type: String }
@@ -65,6 +65,10 @@ const PostComments = (props: Props) => {
   }
 
   const loadMore = (type: string) => {
+    if (isPending) {
+      return;
+    }
+
     startTransition(() => {
       const { id } = post;
       const { endCursor, startCursor } = pageInfo;
@@ -89,7 +93,6 @@ const PostComments = (props: Props) => {
   };
 
   const isDisabledOld = !pageInfo.hasNextPage;
-  const isDisabledNew = !pageInfo.hasPreviousPage;
 
   return (
     <Flex flex={1} p='16px' flexDirection='column'>
@@ -112,13 +115,7 @@ const PostComments = (props: Props) => {
         </Flex>
       )}
       <Flex flex={1} justifyContent='flex-end' mt='10px'>
-        <Button
-          variant='contained'
-          color='primary'
-          style={{ margin: '0 15px' }}
-          onClick={() => loadMore('new')}
-          disabled={isDisabledNew}
-        >
+        <Button variant='contained' color='primary' style={{ margin: '0 15px' }} onClick={() => loadMore('new')}>
           Show newer
         </Button>
         <Button variant='contained' color='primary' onClick={() => loadMore('old')} disabled={isDisabledOld}>
