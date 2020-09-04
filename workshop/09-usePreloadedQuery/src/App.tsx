@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Flex, Text } from 'rebass';
 import { Content } from '@workshop/ui';
-import { graphql, useLazyLoadQuery } from 'react-relay/hooks';
+import { graphql, usePreloadedQuery } from 'react-relay/hooks';
 
 import Feed from './Feed';
 
@@ -13,13 +13,10 @@ type Props = {
     appQuery: any;
   };
 };
+
 // eslint-disable-next-line
 const App = ({ prepared }: Props) => {
-  /**
-   * TODO
-   * use usePreloadedQuery instead of useLazyLoadQuery
-   */
-  const query = useLazyLoadQuery<AppQuery>(
+  const query = usePreloadedQuery<AppQuery>(
     graphql`
       query AppQuery {
         ...Feed_query
@@ -28,6 +25,7 @@ const App = ({ prepared }: Props) => {
         }
       }
     `,
+    prepared.appQuery,
   );
 
   return (

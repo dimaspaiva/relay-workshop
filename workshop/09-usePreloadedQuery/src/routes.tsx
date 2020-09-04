@@ -12,10 +12,20 @@ export const routes = [
     path: '/',
     exact: true,
     prepare: () => {
-      /**
-       * TODO
-       * add preloadQuery to start fetching before component has mounted
-       */
+      const AppQuery = require('./__generated__/AppQuery.graphql');
+
+      return {
+        appQuery: preloadQuery(
+          Environment,
+          AppQuery,
+          {
+            variables: {},
+          },
+          {
+            fetchPolicy: 'network-only',
+          },
+        ),
+      };
     },
   },
   {
@@ -24,11 +34,20 @@ export const routes = [
     component: JSResource('PostDetail', () => import('./components/feed/post/PostDetail')),
     // eslint-disable-next-line
     prepare: (params: { id: string }) => {
-      /**
-       * TODO
-       * add preloadQuery to start fetching before component has mounted
-       * use params as query variables
-       */
+      const PostDetailQuery = require('./components/feed/post/__generated__/PostDetailQuery.graphql');
+
+      return {
+        postDetailQuery: preloadQuery(
+          Environment,
+          PostDetailQuery,
+          {
+            id: params.id,
+          },
+          {
+            fetchPolicy: 'store-or-network',
+          },
+        ),
+      };
     },
   },
 ];
