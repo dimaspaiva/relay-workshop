@@ -79,16 +79,15 @@ it('should render post like button and likes count', async () => {
   // eslint-disable-next-line
   const { debug, getByText, getByTestId } = render(<Root />);
 
-  // debug();
-
-  // it should render likes count
   expect(getByText('10')).toBeTruthy();
 
-  /**
-   * TODO
-   * get like button
-   * click like button
-   * wait mutation to be called
-   * assert mutation variables
-   */
+  const likeBtn = getByTestId('likeButton');
+
+  fireEvent.click(likeBtn);
+
+  await wait(() => Environment.mock.getMostRecentOperation());
+  const mutationOperation = Environment.mock.getMostRecentOperation();
+
+  expect(mutationOperation.fragment.variables.input).toEqual({ post: postId });
+  expect(getByText('11')).toBeTruthy();
 });
