@@ -17,7 +17,6 @@ import { withProviders } from '../../../../../test/withProviders';
 
 it('should render post like button', async () => {
   const postId = 'postId';
-
   const routes = [
     {
       component: JSResource('Component', () => new Promise(resolve => resolve(PostDetail))),
@@ -26,34 +25,29 @@ it('should render post like button', async () => {
   ];
 
   const initialEntries = [`/post/${postId}`];
-
   const PostDetailQuery = require('../__generated__/PostDetailQuery.graphql');
 
-  // eslint-disable-next-line
   const query = PostDetailQuery;
-  // eslint-disable-next-line
   const variables = {
     id: postId,
   };
 
-  /**
-   * TODO
-   * mock content of Post
-   */
-  // eslint-disable-next-line
   const customMockResolvers = {
-    Post: () => ({}),
+    Post: () => ({
+      id: postId,
+      content: 'somePost',
+      author: {
+        id: 'authorId',
+        name: 'authorName',
+      },
+      meHasLiked: true,
+      likesCount: 9,
+    }),
   };
 
-  /**
-   * TODO
-   * queue a pending operation, this would be a preloadQuery call
-   */
+  Environment.mock.queuePendingOperation(query, variables);
 
-  /**
-   * TODO
-   * mock a queued operation
-   */
+  Environment.mock.queueOperationResolver(operation => MockPayloadGenerator.generate(operation, customMockResolvers));
 
   const Root = withProviders({
     routes,
@@ -62,18 +56,61 @@ it('should render post like button', async () => {
   });
 
   const prepared = {
-    /**
-     * TODO
-     * preload query
-     */
-    postDetailQuery: {},
+    postDetailQuery: preloadQuery(Environment, PostDetailQuery, variables, {
+      fetchPolicy: 'store-or-network',
+    }),
   };
 
-  // eslint-disable-next-line
+  const { getByText, getByTestId } = render(<Root prepared={prepared} />);
+
+  // uncomment to check DOM
+  // debug();
+
+  expect(getByText('somePost')).toBeTruthy();
+  expect(getByTestId('likeButton')).toBeTruthy();
+});
+
+it('should not render a post', async () => {
+  const postId = 'postId2';
+  const routes = [
+    {
+      component: JSResource('Component', () => new Promise(resolve => resolve(PostDetail))),
+      path: '/post/:id',
+    },
+  ];
+
+  const initialEntries = [`/post/${postId}`];
+  const PostDetailQuery = require('../__generated__/PostDetailQuery.graphql');
+
+  const query = PostDetailQuery;
+  const variables = {
+    id: postId,
+  };
+
+  const customMockResolvers = {
+    Post: () => null,
+  };
+
+  Environment.mock.queuePendingOperation(query, variables);
+
+  Environment.mock.queueOperationResolver(operation => MockPayloadGenerator.generate(operation, customMockResolvers));
+
+  const Root = withProviders({
+    routes,
+    initialEntries,
+    Component: PostDetail,
+  });
+
+  const prepared = {
+    postDetailQuery: preloadQuery(Environment, PostDetailQuery, variables, {
+      fetchPolicy: 'olny-network',
+    }),
+  };
+
   const { debug, getByText } = render(<Root prepared={prepared} />);
 
   // uncomment to check DOM
   debug();
 
-  expect(getByText('Welcome to React Europe')).toBeTruthy();
+  expect(getByText('Post not found')).toBeTruthy();
 });
