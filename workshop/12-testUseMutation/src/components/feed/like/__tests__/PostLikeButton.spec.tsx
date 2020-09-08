@@ -3,6 +3,7 @@ import { render, fireEvent, wait } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import React from 'react';
 import { MockPayloadGenerator } from 'relay-test-utils';
+import { act } from 'react-dom/test-utils';
 
 import { usePreloadedQuery, graphql, preloadQuery } from 'react-relay/hooks';
 
@@ -86,8 +87,25 @@ it('should render post like button and likes count', async () => {
   fireEvent.click(likeBtn);
 
   await wait(() => Environment.mock.getMostRecentOperation());
+
+  const customMutationMockResolver = {
+    Post: () => ({
+      id: postId,
+      likesCount: 11,
+      meHasLiked: true,
+    }),
+  };
+
   const mutationOperation = Environment.mock.getMostRecentOperation();
 
-  expect(mutationOperation.fragment.variables.input).toEqual({ post: postId });
+  expect(getMutationOperationVariables(mutationOperation).input).toEqual({ post: postId });
+
+  act(() => {
+    Environment.mock.resolve(
+      mutationOperation,
+      MockPayloadGenerator.generate(mutationOperation, customMutationMockResolver),
+    );
+  });
+
   expect(getByText('11')).toBeTruthy();
 });
